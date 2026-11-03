@@ -18,4 +18,4 @@
 2. Nguyễn Thị Kim Ngọc (MSSV: DPM235456)
 3. Nguyễn Kim Ngân (MSSV: DPM235452)
 4. Bùi Võ Thảo Quyên (MSSV: DPM235472)
-5. Đỗ Thị Mỹ An (MSSV: DPM235402)
+5. Đỗ Thị Mỹ An (MSSV: DPM235401)
