@@ -10,7 +10,7 @@
 ## 2. Link Mô phỏng & Video Demo
 * **Mô phỏng Node 1:** (https://wokwi.com/projects/479598781372565505)
 * **Mô phỏng Node 2:** (https://wokwi.com/projects/479597080971888641)
-* **Mô phỏng Node 3:** https://wokwi.com/projects/479597120923694081
+* **Mô phỏng Node 3:** (https://wokwi.com/projects/479597120923694081)
 * **Video Demo dự án:** [Dán link YouTube vào đây]
 
 ## 3. Thành viên thực hiện
@@ -18,4 +18,4 @@
 2. Nguyễn Thị Kim Ngọc (MSSV: DPM235456)
 3. Nguyễn Kim Ngân (MSSV: DPM235452)
 4. Bùi Võ Thảo Quyên (MSSV: DPM235472)
-5. Đỗ Thị Mỹ An (MSSV: 2)
+5. Đỗ Thị Mỹ An (MSSV: DPM235402)
