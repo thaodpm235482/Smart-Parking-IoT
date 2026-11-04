@@ -4,9 +4,7 @@ import ujson
 from machine import Pin, PWM, SoftI2C
 from umqtt_simple import MQTTClient
 
-# ==========================================
 # 1. THƯ VIỆN NỘI BỘ: LCD I2C DRIVER
-# ==========================================
 class I2cLcd:
     def __init__(self, i2c, i2c_addr, num_lines, num_columns):
         self.i2c = i2c
@@ -49,10 +47,8 @@ class I2cLcd:
                 self.hal_write_command(0xC0)
             else:
                 self.hal_write_data(ord(char))
-
-# ==========================================
+                
 # 2. KHỞI TẠO VÀ CẤU HÌNH PHẦN CỨNG
-# ==========================================
 sta_if = network.WLAN(network.STA_IF)
 sta_if.active(True)
 sta_if.connect('Wokwi-GUEST', '')
@@ -122,9 +118,7 @@ update_lcd()
 last_ir_state = 1
 last_ping = time.ticks_ms()
 
-# ==========================================
 # 3. VÒNG LẶP CHÍNH VỚI KHẢ NĂNG TỰ KHÔI PHỤC
-# ==========================================
 while True:
     try:
         # Kiểm tra tin nhắn MQTT liên tục
