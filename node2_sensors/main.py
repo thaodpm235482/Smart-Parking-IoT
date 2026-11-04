@@ -5,9 +5,7 @@ import urequests
 from machine import Pin
 from umqtt_simple import MQTTClient
 
-# ==========================================
 # 1. KẾT NỐI WI-FI WOKWI
-# ==========================================
 sta_if = network.WLAN(network.STA_IF)
 sta_if.active(True)
 sta_if.connect('Wokwi-GUEST', '')
@@ -15,16 +13,12 @@ while not sta_if.isconnected():
     time.sleep(0.1)
 print("Project 2: Wi-Fi OK!")
 
-# ==========================================
 # 2. CẤU HÌNH CẢM BIẾN Ô ĐỖ
-# ==========================================
 slot1 = Pin(12, Pin.IN, Pin.PULL_UP)
 slot2 = Pin(14, Pin.IN, Pin.PULL_UP)
 slot3 = Pin(27, Pin.IN, Pin.PULL_UP)
 
-# ==========================================
 # 3. THÔNG SỐ MQTT VÀ THINGSPEAK
-# ==========================================
 MQTT_SERVER = 'broker.hivemq.com'
 CLIENT_ID = 'esp32_sensor_sender_2026_pro'
 TOPIC = 'smart_parking_wokwi_final_999'
@@ -58,9 +52,7 @@ def send_to_thingspeak(s1, s2, s3, free):
 last_state = ""
 last_thingspeak_time = 0
 
-# ==========================================
 # 4. VÒNG LẶP CHÍNH
-# ==========================================
 while True:
     # 1: Có xe (kéo xuống GND), 0: Trống
     s1_val = 1 if slot1.value() == 0 else 0
