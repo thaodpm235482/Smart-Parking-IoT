@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "author": "Smart Parking Node 3 - Full Wiring",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-breadboard", "id": "bb1", "top": 200, "left": -120, "attrs": {} },
+    { "type": "board-ssd1306", "id": "oled1", "top": -150, "left": 20, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "esp:GND.1", "bb1:GND.1", "black", [ "v0" ] ],
+    [ "esp:3V3", "bb1:TP.1", "red", [ "v0" ] ],
+    [ "oled1:GND", "bb1:GND.2", "black", [ "v0" ] ],
+    [ "oled1:VCC", "bb1:TP.2", "red", [ "v0" ] ],
+    [ "oled1:SDA", "esp:21", "blue", [ "v0" ] ],
+    [ "oled1:SCL", "esp:22", "yellow", [ "v0" ] ],
+    [ "esp:GND.2", "bb1:tn.1", "black", [ "h0" ] ],
+    [ "esp:3V3", "bb1:tp.20", "red", [ "h33.1", "v23.9", "h2.8" ] ],
+    [ "oled1:GND", "bb1:tn.39", "black", [ "v-38.86", "h299.83" ] ],
+    [ "oled1:VCC", "bb1:tp.36", "red", [ "v-29.26", "h261.58" ] ],
+    [ "oled1:SCL", "esp:D22", "gold", [ "v-19.66", "h66.93", "v197.2" ] ],
+    [ "oled1:SDA", "esp:D21", "green", [ "v-10.06", "h47.5", "v216.5" ] ]
+  ],
+  "dependencies": {}
+}
