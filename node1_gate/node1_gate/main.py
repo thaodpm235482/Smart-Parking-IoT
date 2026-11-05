@@ -1,109 +1,80 @@
 import network
 import time
 import ujson
-from machine import Pin, PWM, SoftI2C
+import urandom
+from machine import Pin, SoftI2C, PWM
+from i2c_lcd import I2cLcd
 from umqtt_simple import MQTTClient
 
-# 1. THƯ VIỆN NỘI BỘ: LCD I2C DRIVER
-class I2cLcd:
-    def __init__(self, i2c, i2c_addr, num_lines, num_columns):
-        self.i2c = i2c
-        self.i2c_addr = i2c_addr
-        time.sleep_ms(20)
-        self._write_init_nibble(0x03)
-        time.sleep_ms(5)
-        self._write_init_nibble(0x03)
-        time.sleep_ms(1)
-        self._write_init_nibble(0x03)
-        self._write_init_nibble(0x02)
-        self.hal_write_command(0x28)
-        self.hal_write_command(0x0C)
-        self.hal_write_command(0x06)
-        self.clear()
+print("--- KHOI DONG NODE 1 ---")
 
-    def _write_init_nibble(self, nibble):
-        byte = (nibble << 4) | 0x08
-        self.i2c.writeto(self.i2c_addr, bytes([byte | 0x04, byte]))
+# 1. Khoi tao LCD & Peripherals
+i2c = SoftI2C(scl=Pin(22), sda=Pin(21), freq=400000)
+lcd = I2cLcd(i2c, 0x27, 2, 16)
+lcd.clear()
+lcd.putstr("Ket noi WiFi...")
 
-    def hal_write_command(self, cmd):
-        high = cmd & 0xF0
-        low = (cmd << 4) & 0xF0
-        self.i2c.writeto(self.i2c_addr, bytes([high | 0x0C, high | 0x08]))
-        self.i2c.writeto(self.i2c_addr, bytes([low | 0x0C, low | 0x08]))
+servo = PWM(Pin(15), freq=50)
+btn = Pin(13, Pin.IN, Pin.PULL_UP)
 
-    def hal_write_data(self, data):
-        high = data & 0xF0
-        low = (data << 4) & 0xF0
-        self.i2c.writeto(self.i2c_addr, bytes([high | 0x0D, high | 0x09]))
-        self.i2c.writeto(self.i2c_addr, bytes([low | 0x0D, low | 0x09]))
+def set_servo_angle(angle):
+    duty = int(40 + (angle / 180.0) * 75)
+    servo.duty(duty)
 
-    def clear(self):
-        self.hal_write_command(0x01)
-        time.sleep_ms(2)
+set_servo_angle(0) # Dong barrier ban dau
 
-    def putstr(self, string):
-        for char in string:
-            if char == '\n':
-                self.hal_write_command(0xC0)
-            else:
-                self.hal_write_data(ord(char))
-                
-# 2. KHỞI TẠO VÀ CẤU HÌNH PHẦN CỨNG
+free_slots = 3 # Mac dinh ban dau trong luc cho dong bo
+
+# 2. Ket noi Wi-Fi chuan
 sta_if = network.WLAN(network.STA_IF)
 sta_if.active(True)
 sta_if.connect('Wokwi-GUEST', '')
+print("Dang cho IP...", end="")
 while not sta_if.isconnected():
-    time.sleep(0.1)
-print("Project 1: Wi-Fi OK!")
+    print(".", end="")
+    time.sleep(0.5)
+print("\nWi-Fi OK! IP:", sta_if.ifconfig()[0])
 
-ir_sensor = Pin(13, Pin.IN, Pin.PULL_UP)
+# 3. Ket noi MQTT
+MQTT_SERVER = 'broker.emqx.io' # Quay lai dung EMQX
 
-servo = PWM(Pin(15), freq=50)
-def set_servo_angle(angle):
-    min_duty = 26
-    max_duty = 122
-    duty = min_duty + int((angle / 180) * (max_duty - min_duty))
-    servo.duty(duty)
+CLIENT_ID = 'node1_gate_hcmut_' + str(urandom.getrandbits(16))
+TOPIC_DATA = 'smart_parking_hcmut_2026_final'
+TOPIC_REQ = 'smart_parking_hcmut_2026_req'
 
-set_servo_angle(0)
-
-i2c = SoftI2C(scl=Pin(22), sda=Pin(21), freq=100000)
-lcd = I2cLcd(i2c, 0x27, 2, 16)
-lcd.clear()
-lcd.putstr("KHOI DONG...")
-
-# CẤU HÌNH THÔNG SỐ MQTT
-MQTT_SERVER = 'broker.hivemq.com'
-# Dùng ID độc nhất theo thời gian thực để tránh trùng lặp làm ngắt kết nối
-CLIENT_ID = 'esp32_gate_phong_node1_' + str(time.ticks_ms())
-TOPIC = 'smart_parking_wokwi_final_999'
-
-slots_free = 3
-
-def update_lcd():
+def update_lcd_status():
     lcd.clear()
-    if slots_free > 0:
-        lcd.putstr("CON TRONG: {}/3\nCHO VAO: OK".format(slots_free))
+    lcd.putstr(f"CHO TRONG: {free_slots}/3\n")
+    if free_slots > 0:
+        lcd.putstr("XIN MOI VAO!")
     else:
-        lcd.putstr("CON TRONG: 0/3\nBAI XE: HET CHO")
+        lcd.putstr("BAI DA DAY!")
 
 def mqtt_callback(topic, msg):
-    global slots_free
+    global free_slots
     try:
         data = ujson.loads(msg.decode('utf-8'))
-        slots_free = data.get('f', 0)
-        print("<- Project 1 nhận chỗ trống:", slots_free)
-        update_lcd()
+        free_slots = data.get('f', free_slots)
+        print("<- Node 1 nhan cap nhat cho trong:", free_slots)
+        update_lcd_status()
     except Exception as e:
-        print("Lỗi đọc gói tin:", e)
+        print("Loi doc msg:", e)
 
-# Hàm hỗ trợ tự kết nối lại khi rớt mạng
 def connect_mqtt():
-    client = MQTTClient(CLIENT_ID, MQTT_SERVER, keepalive=60)
+    print("Dang ket noi MQTT Server...")
+    client = MQTTClient(CLIENT_ID, MQTT_SERVER, port=1883, keepalive=60)
     client.set_callback(mqtt_callback)
     client.connect()
-    client.subscribe(TOPIC)
-    print("Project 1: Đã kết nối MQTT Broker thành công!")
+    client.subscribe(TOPIC_DATA)
+    print("Node 1: Da ket noi MQTT thanh cong!")
+    
+    # GUI YEU CAU DONG BO TRANG THAI NGAY KHI KET NOI
+    try:
+        client.publish(TOPIC_REQ, "get_status")
+        print("-> Node 1: Da gui yeu cau dong bo trang thai toi Node 2")
+    except Exception as e:
+        print("Loi gui yeu cau dong bo:", e)
+        
     return client
 
 client = None
@@ -111,60 +82,44 @@ while client is None:
     try:
         client = connect_mqtt()
     except Exception as e:
-        print("Lỗi kết nối MQTT, đang thử lại...", e)
-        time.sleep(2)
+        print("Loi MQTT, dang thu lai...", e)
+        time.sleep(1)
 
-update_lcd()
-last_ir_state = 1
+update_lcd_status()
+
+last_btn_state = 1
 last_ping = time.ticks_ms()
 
-# 3. VÒNG LẶP CHÍNH VỚI KHẢ NĂNG TỰ KHÔI PHỤC
 while True:
     try:
-        # Kiểm tra tin nhắn MQTT liên tục
         client.check_msg()
-        
-        # Ping broker định kỳ mỗi 15 giây để duy trì kết nối (Heartbeat)
         if time.ticks_diff(time.ticks_ms(), last_ping) > 15000:
             client.ping()
             last_ping = time.ticks_ms()
-            
-    except OSError as e:
-        print("Phát hiện mất kết nối MQTT, đang kết nối lại...", e)
+    except OSError:
         try:
             client = connect_mqtt()
-            update_lcd()
         except:
-            time.sleep(2)
-            continue
-
-    current_ir_state = ir_sensor.value()
-    
-    # Khi xe bấm nút mở cổng
-    if current_ir_state == 0 and last_ir_state == 1:
-        if slots_free > 0:
-            lcd.clear()
-            lcd.putstr("XIN MOI VAO...\nMO BARRIER")
-            set_servo_angle(90)
-            
-            # Chia nhỏ thời gian chờ và duy trì check_msg() để không bị rớt mạng trong lúc chờ 5s
-            for _ in range(50):
-                try:
-                    client.check_msg()
-                except:
-                    pass
-                time.sleep(0.1)
-            
-            lcd.clear()
-            lcd.putstr("DANG DONG CONG...")
-            set_servo_angle(0)
             time.sleep(1)
-            update_lcd()
-        else:
+
+    # 4. Kiem tra nut bam mo cong
+    current_btn = btn.value()
+    if current_btn == 0 and last_btn_state == 1:
+        if free_slots > 0:
+            print("=> [CHO PHEP] Co cho trong! Mo barrier...")
             lcd.clear()
-            lcd.putstr("HET CHO!\nKHONG THE MO")
+            lcd.putstr("XE DANG VAO...\nMO BARRIER!")
+            set_servo_angle(90)  # 1. MO CONG (90 do)
+            time.sleep(10)       # 2. CHO XE QUA (10 GIAY)
+            set_servo_angle(0)   # 3. DONG CONG (0 do)
+            print("=> Barrier da dong sau 10 giay.")
+            update_lcd_status()  # 4. CAP NHAT LAI MAN HINH
+        else:
+            print("=> [TU CHOI] Bai da DAY! Khong the mo barrier.")
+            lcd.clear()
+            lcd.putstr("BAI DA DAY!\nKHONG THE VAO!")
             time.sleep(2)
-            update_lcd()
-            
-    last_ir_state = current_ir_state
+            update_lcd_status()
+    
+    last_btn_state = current_btn
     time.sleep(0.1)
