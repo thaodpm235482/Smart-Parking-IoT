@@ -1,0 +1,51 @@
+{
+  "version": 1,
+  "author": "Smart Parking Node 1 - Full Wiring",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-breadboard", "id": "bb1", "top": 200, "left": -120, "attrs": {} },
+    {
+      "type": "wokwi-lcd1602",
+      "id": "lcd1",
+      "top": -176,
+      "left": 178.4,
+      "attrs": { "pins": "i2c" }
+    },
+    { "type": "wokwi-servo", "id": "servo1", "top": -2, "left": 288, "attrs": {} },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "btn1",
+      "top": -120,
+      "left": -100,
+      "attrs": { "color": "green" }
+    }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "esp:GND.1", "bb1:GND.1", "black", [ "v0" ] ],
+    [ "esp:3V3", "bb1:TP.1", "red", [ "v0" ] ],
+    [ "lcd1:GND", "bb1:GND.2", "black", [ "v0" ] ],
+    [ "lcd1:VCC", "bb1:TP.2", "red", [ "v0" ] ],
+    [ "lcd1:SDA", "esp:21", "blue", [ "v0" ] ],
+    [ "lcd1:SCL", "esp:22", "yellow", [ "v0" ] ],
+    [ "servo1:GND", "bb1:GND.3", "black", [ "v0" ] ],
+    [ "servo1:V+", "bb1:TP.3", "red", [ "v0" ] ],
+    [ "servo1:PWM", "esp:15", "orange", [ "v0" ] ],
+    [ "btn1:1.NOC", "esp:13", "green", [ "v0" ] ],
+    [ "btn1:2.NO", "bb1:GND.4", "black", [ "v0" ] ],
+    [ "esp:3V3", "bb1:tp.20", "red", [ "h42.7", "v52.7", "h-6.8" ] ],
+    [ "esp:GND.1", "bb1:tn.21", "black", [ "h0" ] ],
+    [ "lcd1:GND", "bb1:tn.23", "black", [ "h0" ] ],
+    [ "lcd1:VCC", "bb1:tp.22", "red", [ "h0" ] ],
+    [ "lcd1:SDA", "esp:D21", "blue", [ "h-67.2", "v187.9" ] ],
+    [ "lcd1:SCL", "esp:D22", "yellow", [ "h0" ] ],
+    [ "servo1:V+", "bb1:tp.31", "red", [ "h0" ] ],
+    [ "servo1:PWM", "esp:D15", "green", [ "h-153.6", "v38.6" ] ],
+    [ "btn1:1.l", "esp:D13", "green", [ "v-17.8", "h105" ] ],
+    [ "btn1:2.r", "bb1:tn.6", "green", [ "h0" ] ],
+    [ "servo1:GND", "bb1:tn.29", "#8f4814", [ "h0" ] ]
+  ],
+  "dependencies": {}
+}
