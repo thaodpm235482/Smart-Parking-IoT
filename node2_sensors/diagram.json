@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "author": "Smart Parking Node 2",
+  "editor": "wokwi",
+  "parts": [
+    { "type": "wokwi-esp32-devkit-v1", "id": "esp", "top": 0, "left": 0, "attrs": {} },
+    { "type": "wokwi-breadboard", "id": "bb1", "top": 200, "left": -120, "attrs": {} },
+    { "type": "wokwi-slide-switch", "id": "sw1", "top": -150, "left": -120, "attrs": {} },
+    { "type": "wokwi-slide-switch", "id": "sw2", "top": -150, "left": 0, "attrs": {} },
+    { "type": "wokwi-slide-switch", "id": "sw3", "top": -150, "left": 120, "attrs": {} }
+  ],
+  "connections": [
+    [ "esp:TX0", "$serialMonitor:RX", "", [] ],
+    [ "esp:RX0", "$serialMonitor:TX", "", [] ],
+    [ "esp:GND.1", "bb1:GND.1", "black", [ "v0" ] ],
+    [ "sw1:1", "esp:12", "green", [ "v0" ] ],
+    [ "sw1:2", "bb1:GND.2", "black", [ "v0" ] ],
+    [ "sw2:1", "esp:14", "green", [ "v0" ] ],
+    [ "sw2:2", "bb1:GND.3", "black", [ "v0" ] ],
+    [ "sw3:1", "esp:27", "green", [ "v0" ] ],
+    [ "sw3:2", "bb1:GND.4", "black", [ "v0" ] ],
+    [ "sw1:1", "esp:D12", "green", [ "v0" ] ],
+    [ "sw1:2", "bb1:tn.1", "black", [ "v10.4", "h27.2", "v327.9" ] ],
+    [ "sw2:1", "esp:D14", "green", [ "h-35.3", "v236" ] ],
+    [ "sw2:2", "bb1:tn.5", "black", [ "v10.4", "h3.2", "v9.6", "h-57.6", "v318.3" ] ],
+    [ "sw3:1", "esp:D27", "green", [ "v29.6", "h-136.1", "v197.2" ] ],
+    [ "sw3:2", "bb1:tn.20", "black", [ "v0" ] ]
+  ],
+  "dependencies": {}
+}
