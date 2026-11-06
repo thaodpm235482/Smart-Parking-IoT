@@ -13,7 +13,7 @@ Hệ thống mô phỏng bãi đỗ xe thông minh bao gồm 3 Node hoạt độ
 * **Mô phỏng Node 1 (Gate):** [Nhấn vào đây để xem trên Wokwi](https://wokwi.com/projects/479829069849204737)
 * **Mô phỏng Node 2 (Sensors):** [Nhấn vào đây để xem trên Wokwi](https://wokwi.com/projects/479829087316388865)
 * **Mô phỏng Node 3 (Display):** [Nhấn vào đây để xem trên Wokwi](https://wokwi.com/projects/479829111901312001)
-* **Video Demo hoạt động:** [👉 Dán link YouTube hoặc Google Drive của nhóm vào đây]
+* **Video Demo hoạt động:** [Youtube] https://youtu.be/NYFmXNT1Ros
 
 > *Ghi chú: Thay đoạn link video ở trên bằng đường dẫn thực tế của nhóm.*
 
